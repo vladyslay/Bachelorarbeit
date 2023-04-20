@@ -4,6 +4,7 @@ from librosa.feature import mfcc
 import librosa
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from scipy.io import wavfile
 from scipy.fftpack import fft
 from scipy import signal
@@ -15,6 +16,7 @@ import time
 import pyaudio
 import math
 import audioop 
+
 
 #testing the fucking git
 
@@ -85,13 +87,25 @@ def process_templates():
     #
     return
 
+# templates = {"label": np.ndarray}
 templates = {}
 for filename in [x for x in os.listdir(template_folder) if x.endswith('.wav')][:-1]:
     # loading files
-    audio, sampling_freq = librosa.load(filename)
+    filepath = os.path.join(template_folder, filename)
+    audio, sampling_freq = librosa.load(filepath)
     
     #extracting mfcc features from templates
     mfcc_features_templates = mfcc(y=audio, sr=sampling_freq)
     
-    print()
+    templates.update({filename[:-6]: mfcc_features_templates})
+    
 
+print(templates.keys())
+fig, ax = plt.subplots()
+mfcc_data= np.swapaxes(templates['apple'], 0 ,1)
+cax = ax.imshow(mfcc_data, interpolation='nearest', cmap=cm.coolwarm, origin='lower')
+ax.set_title('MFCC')
+
+plt.show()
+#plt.plot()
+#plt.show()
