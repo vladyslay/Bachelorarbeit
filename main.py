@@ -16,6 +16,8 @@ import pyaudio
 import math
 import audioop 
 
+#testing the fucking git
+
 #**********************************************
 # filtering and processing functions from main
 def applyFilter(ein, win_han, lp, hp):
