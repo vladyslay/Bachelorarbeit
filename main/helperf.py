@@ -59,8 +59,12 @@ def volumeFilter(data_raw):
 
 
 
-def extractFeatures(fft_norm, hf_range, lf_range,vol_tres):
-
+def extractFeatures(fft_norm, hf_range, lf_range,vol_tres, mode="on-off-set"):
+	if mode == "speech_recognition":
+		#TODO 
+		a = 0
+  
+	# mode == on-off-set
 	features = 0
 	# Peak von Referenzfrequenz:d_pcm_usb_stream_open) Invalid type for card
 

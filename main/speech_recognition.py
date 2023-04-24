@@ -42,10 +42,10 @@ sample_folder = './samples'
 # processing templates
 def process_template(signal, sampling_freq):
     #filtering
-    filtered = applyFilter()
+    filtered = applyFilter(signal, win_han, lp_coeff, hp_coeff)
     
     #extracting mfcc features from templates
-    mfcc_features_templates = mfcc(y=signal, sr=sampling_freq)
+    mfcc_features_templates = mfcc(y=filtered, sr=sampling_freq)
     
     return mfcc_features_templates
 
