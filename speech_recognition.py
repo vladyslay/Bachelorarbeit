@@ -60,3 +60,16 @@ for filename in [x for x in os.listdir(template_folder) if x.endswith('.wav')][:
     
     templates.update({filename[:-6]: process_template})
     
+    
+    
+def recognize_commando():
+    return
+
+def recognize_keyword():
+    return
+
+def recognize_feedback():
+    return
+
+def training():
+    return

@@ -6,32 +6,17 @@ import sys
 import time
 import pyaudio
 import matplotlib.pyplot as plt
-########################################## Ansprechen des Boards 
-#GPIO:                                          #[3]
-# import RPi.GPIO as GPIO 
 import pigpio as GPIO           
 from helperf import *
 
-#pin_out = 37
-#pin_stoer = 38  
-#pin_detect = 36
-#pin_off = 35
-
 pause_timer = 4 #! magic number
-
-#GPIO.setmode(GPIO.BOARD)            
-#GPIO.setup(pin_out, GPIO.OUT)       
-#GPIO.setup(pin_stoer, GPIO.OUT)
-#GPIO.setup(pin_detect, GPIO.IN)
-#GPIO.setup(pin_off, GPIO.OUT)
-################ 
 
 start = time.time()         #[10.2]
 print("Start")
 
 
 # ******************************************************
-# ************* Define params ****************************
+# ************* Define params **************************
 # ******************************************************
 '''
 FRAME = 10      #ms
@@ -95,7 +80,7 @@ st_tres =[]
 def on_off_set():
 	# here goes the loop below
 	
-    return
+    return templates
 
 #TODO get rid of the pause after offset
 # recording audio and setting offsets

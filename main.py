@@ -1,21 +1,4 @@
 
-#! mocking funktions, while real ones are under developement
-def training():
-    return
-
-def on_off_set():
-    return
-
-def recognize_commando():
-    return
-
-def recognize_keyword():
-    return
-
-def recognize_feedback():
-    return
-
-
 #************************************************************
 #********************Initialisierung*************************
 #************************************************************
@@ -28,6 +11,8 @@ import pyaudio
 import math
 import audioop 
 import matplotlib.pyplot as plt
+from speech_recognition import recognize_commando, recognize_feedback, recognize_keyword, training
+from on_off_set import on_off_set
 ########################################## Ansprechen des Boards 
 #GPIO:                                          #[3]
 # import RPi.GPIO as GPIO 
