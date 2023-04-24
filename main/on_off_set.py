@@ -76,13 +76,60 @@ n = 0
 end = 0
 st_tres =[] 
 
-
+# funktion returns a chunk of audio between on/off-set pair
 def on_off_set():
 	# here goes the loop below
-	
-    return templates
+	# start recording audio
+        data_raw =  stream.read(CHUNK)
+        #? if speech is not present anymore - set endpoint
+        if (speech == False):
+            end = time.time() - pause
+            if end >= pause_timer:
+                speech = True
+                offset_detected = False
+        else: # speech = True
+            vol_tres = volumeFilter(data_raw)
+            data_buffer_int = np.frombuffer(data_raw, dtype=np.int16)
+            data_int = np.add(data_buffer_int, ref) 
+            # print("Amplitude:  ", np.mean(data_buffer_int)), #andere art zum ausgeben der amplitude
+            
+            #! filtered data
+            filtered_data = applyFilter(data_int, win_han, lp_coeff, hp_coeff)
+            
+            # apply fft (tranform to frequency spectrum)
+            fft_norm = applyFFT(filtered_data, RATE, win_han, lp_coeff, hp_coeff)
+            # calc number of features extracted
+            num_features_detected = extractFeatures(fft_norm, hf_range, lf_range,vol_tres)
+         
+            # check if speech onset is detected
+            if num_features_detected >= 4 and offset_detected == False: #zusaetzliches feature lautstaerke
+            
+                if d < 1:
+                    print("onset")
+                    time.sleep(0.005)
+                    onset_detected = True
+                d += 1
+            elif onset_detected == True and d ==1 and num_features_detected >= 3:
+                d += 1	# pass if after onset only 3 features detected
+            elif onset_detected == True and d >= 2:
+                print("offset")
+                time.sleep(0.005)
+                onset_detected = False
+                offset_detected = True
+                speech = False
+                pause = time.time() 
+                d = 0
+            elif onset_detected == True and d == 1:
+                print("Stoergeraeusch erkannt")
+                time.sleep(0.0001)
+                d = 0
+                onset_detected = False
+                offset_detected = False
+        return  
 
 #TODO get rid of the pause after offset
+# code below is commented
+'''
 # recording audio and setting offsets
 while (True):
     try:
@@ -149,3 +196,4 @@ while (True):
         
         
         sys.exit()
+'''

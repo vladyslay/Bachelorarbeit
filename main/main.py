@@ -48,9 +48,15 @@ training()
 #********************Recognition phase***********************
 #************************************************************
 
-while(True):
+keyword_recognized = False
+commando_recognized = False
+while keyword_recognized == False:
+    # has to return a val for keyword_recognize
     recognize_keyword()
-    recognize_commando()
+    while commando_recognized == False and keyword_recognized == True:
+        # has to return a val for commando_recognized 
+        recognize_commando()
+
 
 
 #************************************************************

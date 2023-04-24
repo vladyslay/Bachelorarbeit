@@ -17,6 +17,7 @@ import pyaudio
 import math
 import audioop 
 from helperf import *
+from on_off_set import on_off_set
 
 
 #why's the fucking git not commiting????
@@ -63,13 +64,17 @@ for filename in [x for x in os.listdir(template_folder) if x.endswith('.wav')][:
     
     
 def recognize_commando():
+    on_off_set()
     return
 
 def recognize_keyword():
+    on_off_set()
     return
 
 def recognize_feedback():
+    on_off_set()
     return
 
 def training():
+    on_off_set()
     return
