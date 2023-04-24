@@ -174,11 +174,6 @@ end = 0
 st_tres =[] 
 
 
-#reverse engineering
-print("d: ", d)
-print("Speech", speech)
-
-
 #old loop here
 '''
 while(True):
