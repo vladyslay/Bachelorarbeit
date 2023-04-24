@@ -252,7 +252,12 @@ while(True):
 
 '''
 
+def on_off_set():
+	# here goes the loop below
+	
+    return
 
+#TODO get rid of the pause after offset
 # recording audio and setting offsets
 while (True):
     try:
