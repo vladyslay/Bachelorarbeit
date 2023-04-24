@@ -18,9 +18,9 @@ import math
 import audioop 
 
 
-#testing the fucking git
+#why's the fucking git not commiting????
 
-#**********************************************
+#*******************Helping funktions**********************
 # filtering and processing functions from main
 def applyFilter(ein, win_han, lp, hp):
     
@@ -78,14 +78,19 @@ win_han = signal.windows.hann(CHUNK)
 
 #! this code is based on a pre recorded audiofiles (to exclude errors of on/off-set setting)
 
-#starage locations for audiofiles
+#storage locations for audiofiles
 template_folder = './templates'
 sample_folder = './samples'
 
 # processing templates
-def process_templates():
-    #
-    return
+def process_template(signal, sampling_freq):
+    #filtering
+    filtered = applyFilter()
+    
+    #extracting mfcc features from templates
+    mfcc_features_templates = mfcc(y=signal, sr=sampling_freq)
+    
+    return mfcc_features_templates
 
 # templates = {"label": np.ndarray}
 templates = {}
@@ -94,18 +99,7 @@ for filename in [x for x in os.listdir(template_folder) if x.endswith('.wav')][:
     filepath = os.path.join(template_folder, filename)
     audio, sampling_freq = librosa.load(filepath)
     
-    #extracting mfcc features from templates
-    mfcc_features_templates = mfcc(y=audio, sr=sampling_freq)
+    processed_template = process_template(audio, sampling_freq)
     
-    templates.update({filename[:-6]: mfcc_features_templates})
+    templates.update({filename[:-6]: process_template})
     
-
-print(templates.keys())
-fig, ax = plt.subplots()
-mfcc_data= np.swapaxes(templates['apple'], 0 ,1)
-cax = ax.imshow(mfcc_data, interpolation='nearest', cmap=cm.coolwarm, origin='lower')
-ax.set_title('MFCC')
-
-plt.show()
-#plt.plot()
-#plt.show()
