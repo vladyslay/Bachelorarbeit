@@ -3,6 +3,9 @@ import numpy as np
 from scipy.fftpack import fft
 from scipy import signal
 import audioop 
+import pyaudio
+import math
+from scipy import signal
 
 f1_threshhold = 0.4
 f2_threshhold = 30

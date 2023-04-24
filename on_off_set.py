@@ -70,8 +70,6 @@ hf_range = [5000,9000]
 lf_range = [0,10]
 
 
-
-
 # Calc filter coefficients 
 hp_coeff = signal.bessel(2, 100, btype='highpass', output='sos', fs=RATE)
 lp_coeff = signal.bessel(10, 11000, btype='lowpass', output='sos', fs=RATE)
@@ -79,7 +77,6 @@ win_han = signal.windows.hann(CHUNK)
 
 
 print("start") # show where onset detection loop starts 
-
 
 #  Main loop for running over the audio signal 
 
