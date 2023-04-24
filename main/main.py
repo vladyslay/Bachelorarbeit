@@ -11,7 +11,7 @@ import pyaudio
 import math
 import audioop 
 import matplotlib.pyplot as plt
-from speech_recognition import recognize_commando, recognize_feedback, recognize_keyword, training
+from main.speech_recognition import recognize_commando, recognize_feedback, recognize_keyword, training
 from on_off_set import on_off_set
 ########################################## Ansprechen des Boards 
 #GPIO:                                          #[3]
