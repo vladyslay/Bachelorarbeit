@@ -1,4 +1,21 @@
 
+#! mocking funktions, while real ones are under developement
+def training():
+    return
+
+def on_off_set():
+    return
+
+def recognize_commando():
+    return
+
+def recognize_keyword():
+    return
+
+def recognize_feedback():
+    return
+
+
 #************************************************************
 #********************Initialisierung*************************
 #************************************************************
@@ -23,3 +40,7 @@
 
 
 
+
+#************************************************************
+#********************Feedback phase**************************
+#************************************************************
