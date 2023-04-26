@@ -12,7 +12,7 @@ import math
 import audioop 
 import matplotlib.pyplot as plt
 from main.speech_recognition import recognize_commando, recognize_feedback, recognize_keyword, training
-from on_off_set import on_off_set
+from record_process_audio import record_process_audio
 ########################################## Ansprechen des Boards 
 #GPIO:                                          #[3]
 # import RPi.GPIO as GPIO 
@@ -42,6 +42,7 @@ pause_timer = 4 #! magic number
 #************************Learning phase**********************
 #************************************************************
 
+training_finished = False
 training()
 
 #************************************************************
@@ -63,4 +64,5 @@ while keyword_recognized == False:
 #********************Feedback phase**************************
 #************************************************************
 
+feedback_recognized = False
 recognize_feedback()

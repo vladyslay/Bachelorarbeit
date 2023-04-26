@@ -17,7 +17,7 @@ import pyaudio
 import math
 import audioop 
 from helperf import *
-from on_off_set import on_off_set
+from record_process_audio import record_process_audio
 
 
 #why's the fucking git not commiting????
@@ -40,6 +40,8 @@ win_han = signal.windows.hann(CHUNK)
 template_folder = './templates'
 sample_folder = './samples'
 
+
+# testing functions
 # processing templates
 def process_template(signal, sampling_freq):
     #filtering
@@ -61,20 +63,22 @@ for filename in [x for x in os.listdir(template_folder) if x.endswith('.wav')][:
     
     templates.update({filename[:-6]: process_template})
     
+def recognize():
     
+    return    
     
 def recognize_commando():
-    on_off_set()
+    sample = record_process_audio()
     return
 
 def recognize_keyword():
-    on_off_set()
+    sample = record_process_audio()
     return
 
 def recognize_feedback():
-    on_off_set()
+    sample = record_process_audio()
     return
 
 def training():
-    on_off_set()
+    template = record_process_audio()
     return

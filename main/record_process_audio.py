@@ -76,11 +76,17 @@ n = 0
 end = 0
 st_tres =[] 
 
-# funktion returns a chunk of audio between on/off-set pair
-def on_off_set():
-	# here goes the loop below
-	# start recording audio
+# funktion returns a chunk of audio between on/off-set pair and a bool val
+def record_process_audio():
+    # here recorded speech is stored
+    speech_piece = np.empty()
+    speech_recorded = False
+    
+    while(speech_recorded == False):
+        a = 0
+        # start recording audio
         data_raw =  stream.read(CHUNK)
+
         #? if speech is not present anymore - set endpoint
         if (speech == False):
             end = time.time() - pause
@@ -92,15 +98,15 @@ def on_off_set():
             data_buffer_int = np.frombuffer(data_raw, dtype=np.int16)
             data_int = np.add(data_buffer_int, ref) 
             # print("Amplitude:  ", np.mean(data_buffer_int)), #andere art zum ausgeben der amplitude
-            
+
             #! filtered data
             filtered_data = applyFilter(data_int, win_han, lp_coeff, hp_coeff)
-            
+
             # apply fft (tranform to frequency spectrum)
             fft_norm = applyFFT(filtered_data, RATE, win_han, lp_coeff, hp_coeff)
             # calc number of features extracted
             num_features_detected = extractFeatures(fft_norm, hf_range, lf_range,vol_tres)
-         
+
             # check if speech onset is detected
             if num_features_detected >= 4 and offset_detected == False: #zusaetzliches feature lautstaerke
             
@@ -125,7 +131,7 @@ def on_off_set():
                 d = 0
                 onset_detected = False
                 offset_detected = False
-        return  
+    return speech_piece
 
 #TODO get rid of the pause after offset
 # code below is commented
