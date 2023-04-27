@@ -1,4 +1,6 @@
 '''
+
+# custom dtw algorithm
 from dtw import *
 import scipy
 from scipy.spatial.distance import euclidean
@@ -25,7 +27,7 @@ def dtw_table(x, y, distance=None):
 
 def dtw(x, y, table):
     i = len(x)
-    j = len(j)
+    j = len(y)
     path = [(i,j)]
     while i > 0 or j > 0:
         minval = np.inf
@@ -45,11 +47,15 @@ def dtw(x, y, table):
 '''
 #**************************************************************************************
 
-from dtaidistance import dtw
-from dtaidistance import dtw_visualisation as dtwvis
+import fastdtw
+from fastdtw import fastdtw
+from scipy.spatial.distance import euclidean
 import numpy as np
 
-s1 = np.array([0., 0, 1, 2, 1, 0, 1, 0, 0, 2, 1, 0, 0])     
-s2 = np.array([0., 1, 2, 3, 1, 0, 0, 0, 2, 1, 0, 0, 0])
-path = dtw.warping_path(s1, s2)
-dtwvis.plot_warping(s1, s2, path, filename="warp.png")
+x = np.array([1, 2, 3, 3, 7])
+y = np.array([1, 2, 2, 2, 2, 2, 2, 4])
+
+distance, path = fastdtw(x, y, dist=euclidean)
+
+print(distance)
+print(path)

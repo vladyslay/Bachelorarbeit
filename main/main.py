@@ -42,8 +42,12 @@ pause_timer = 4 #! magic number
 #************************Learning phase**********************
 #************************************************************
 
+# define the list of needed keywords and commands
+keywords = []
+commandos = []
+
 training_finished = False
-training()
+templates_keywords, templates_commandos = training(keywords, commandos)
 
 #************************************************************
 #********************Recognition phase***********************

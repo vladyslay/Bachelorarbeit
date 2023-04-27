@@ -18,6 +18,8 @@ import math
 import audioop 
 from helperf import *
 from record_process_audio import record_process_audio
+from fastdtw import fastdtw
+from scipy.spatial.distance import euclidean
 
 
 #why's the fucking git not commiting????
@@ -63,10 +65,18 @@ for filename in [x for x in os.listdir(template_folder) if x.endswith('.wav')][:
     
     templates.update({filename[:-6]: process_template})
     
-def recognize():
+    
+    
+def recognize(templates, sample):
+    # dynamic time wrapping to pair corresponding frames 
+    # also return a distance between two time sequences - similarity measure
+    for template in templates:
+        distance, path = fastdtw(template, sample, dist=euclidean)
     
     return    
-    
+
+
+# little abstraction 
 def recognize_commando():
     sample = record_process_audio()
     return
@@ -75,10 +85,23 @@ def recognize_keyword():
     sample = record_process_audio()
     return
 
+'''
 def recognize_feedback():
     sample = record_process_audio()
     return
+'''
 
-def training():
-    template = record_process_audio()
-    return
+
+def training(keywords, commandos):
+    # separate storage spaces for diff types of templates to reduce search spaces
+    templates_keywords = {}
+    templates_commandos = {}
+    for keyword in keywords:
+        template = record_process_audio()
+        templates_keywords.update({keyword: template})
+        
+    for commando in commandos:
+        template = record_process_audio()
+        templates_commandos.update({commando: template})
+        
+    return templates_keywords, templates_commandos
