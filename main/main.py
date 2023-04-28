@@ -11,7 +11,7 @@ import pyaudio
 import math
 import audioop 
 import matplotlib.pyplot as plt
-from main.speech_recognition import recognize_commando, recognize_feedback, recognize_keyword, training
+from main.speech_recognition import recognize, training
 from record_process_audio import record_process_audio
 ########################################## Ansprechen des Boards 
 #GPIO:                                          #[3]
@@ -55,12 +55,13 @@ templates_keywords, templates_commandos = training(keywords, commandos)
 
 keyword_recognized = False
 commando_recognized = False
+
 while keyword_recognized == False:
     # has to return a val for keyword_recognize
-    recognize_keyword()
+    keyword_recognized, matched_keyword = recognize(keywords)
     while commando_recognized == False and keyword_recognized == True:
         # has to return a val for commando_recognized 
-        recognize_commando()
+        commando_recognized, matched_commando = recognize(commandos)
 
 
 
@@ -69,4 +70,4 @@ while keyword_recognized == False:
 #************************************************************
 
 feedback_recognized = False
-recognize_feedback()
+recognize()

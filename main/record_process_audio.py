@@ -76,7 +76,9 @@ n = 0
 end = 0
 st_tres =[] 
 
-# funktion returns a chunk of audio between on/off-set pair and a bool val
+
+#TODO make a funktion return recorded signal
+# funktion returns a chunk of audio between on/off-set pair
 def record_process_audio():
     # here recorded speech is stored
     speech_piece = np.empty()
@@ -123,6 +125,7 @@ def record_process_audio():
                 onset_detected = False
                 offset_detected = True
                 speech = False
+                speech_recorded = True
                 pause = time.time() 
                 d = 0
             elif onset_detected == True and d == 1:
