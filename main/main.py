@@ -2,21 +2,20 @@
 #************************************************************
 #********************Initialisierung*************************
 #************************************************************
-import numpy as np
-from scipy.fftpack import fft
-from scipy import signal
-import sys
+#import numpy as np
+#from scipy.fftpack import fft
+#from scipy import signal
+#import sys
 import time
-import pyaudio
-import math
-import audioop 
-import matplotlib.pyplot as plt
-from main.speech_recognition import recognize, training
-from record_process_audio import record_process_audio
+#import pyaudio
+#import math
+#import audioop 
+#import matplotlib.pyplot as plt
+from speech_recognition import recognize, training, recognize_prerecorded
 ########################################## Ansprechen des Boards 
 #GPIO:                                          #[3]
 # import RPi.GPIO as GPIO 
-import pigpio as GPIO           
+#import pigpio as GPIO           
 
 #pin_out = 37
 #pin_stoer = 38  
@@ -33,17 +32,22 @@ pause_timer = 4 #! magic number
 
 
 
+#************************************************************
+#********************Testing prerecorded*********************
+#************************************************************
 
 
+recognize_prerecorded('MFCC')
 
 
+'''
 
 #************************************************************
 #************************Learning phase**********************
 #************************************************************
 
 # define the list of needed keywords and commands
-keywords = []
+keywords = ["exo", "ok", "nein"]
 commandos = []
 
 training_finished = False
@@ -71,3 +75,5 @@ while keyword_recognized == False:
 
 feedback_recognized = False
 recognize()
+
+'''

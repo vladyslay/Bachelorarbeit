@@ -3,23 +3,15 @@
 from librosa.feature import mfcc
 import librosa
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from scipy.io import wavfile
-from scipy.fftpack import fft
 from scipy import signal
 import os
-# import argparse
-# from hmmlearn import hmm
-# import sys
-# import time
-# import pyaudio
-# import math
-# import audioop
+import time
 from helperf import *
 from record_process_audio import record_process_audio
 from fastdtw import fastdtw
-from scipy.spatial.distance import euclidean
+from scipy.spatial.distance import euclidean, sqeuclidean
+from dtw import dtw
+from numpy.linalg import norm
 
 
 # Bereiche: [low,high] --> what are these ?
@@ -43,41 +35,111 @@ sample_folder = './samples'
 
 # testing functions
 # processing templates
-def process_signal(signal, sampling_freq):
+def process_signal(audio, sampling_freq, mode):
     # filtering
-    filtered = applyFilter(signal, win_han, lp_coeff, hp_coeff)
+    win_size = audio.shape[0]
+    win_han = signal.windows.hann(win_size)
+    filtered = applyFilter(audio, win_han, lp_coeff, hp_coeff)
 
+    if mode == 'MFCC':
     # extracting mfcc features from templates
-    mfcc_features_templates = mfcc(y=filtered, sr=sampling_freq)
+        features_templates = mfcc(y=filtered, sr=sampling_freq)
+    elif mode == 'FFT':
+        features_templates = applyFFT(filtered, sampling_freq, win_han, lp_coeff, hp_coeff)
 
-    return mfcc_features_templates
+    return features_templates
 
 
-# templates = {"label": np.ndarray}
-templates = {}
-for filename in [x for x in os.listdir(template_folder) if x.endswith('.wav')][:-1]:
-    # loading files
-    filepath = os.path.join(template_folder, filename)
-    audio, sampling_freq = librosa.load(filepath)
 
-    processed_template = process_signal(audio, sampling_freq)
 
-    templates.update({filename[:-6]: process_signal})
+
+# recognize for prerecorded audio samples
+def recognize_prerecorded(mode):
+    # process and store templates
+    # templates = {"label": np.ndarray}
+    templates = []
+    for filename in [x for x in os.listdir(template_folder) if x.endswith('.wav')][:-1]:
+        # loading files
+        filepath = os.path.join(template_folder, filename)
+        audio, sampling_freq = librosa.load(filepath)
+
+        if mode == 'MFCC':
+            processed_template = process_signal(audio, sampling_freq, 'MFCC')
+            templates.append((filename[:-6], processed_template))
+        elif mode == 'FFT':
+            processed_template = process_signal(audio, sampling_freq, 'FFT')
+            templates.append((filename[:-6], processed_template))
+        elif mode == 'FM':
+            processed_template_mfcc = process_signal(audio, sampling_freq, 'MFCC')
+            processed_template_fft = process_signal(audio, sampling_freq, 'FFT')
+            templates.append((filename[:-6], processed_template_mfcc, processed_template_fft))
+        
+        #print('Template processed', templates[-1][0])
+        #print("Template shape: ", processed_template.shape)
+    
+    
+    # process and store samples
+    samples = []
+    for filename in [x for x in os.listdir(sample_folder) if x.endswith('.wav')][:-1]:
+        # loading files
+        filepath = os.path.join(sample_folder, filename)
+        audio, sampling_freq = librosa.load(filepath)
+
+        if mode == 'MFCC':
+            processed_sample = process_signal(audio, sampling_freq, 'MFCC')
+            samples.append((filename[:-6], processed_sample))
+        elif mode == 'FFT':
+            processed_sample = process_signal(audio, sampling_freq, 'FFT')
+            samples.append((filename[:-6], processed_sample))
+        elif mode == 'FM':
+            processed_sample_mfcc = process_signal(audio, sampling_freq, 'MFCC')
+            processed_sample_fft = process_signal(audio, sampling_freq, 'FFT')
+            samples.append((filename[:-6], processed_sample_mfcc, processed_sample_fft))
+        
+    
+    # recognize
+    print('Start matching')
+    for sample in samples:
+        start = time.time()
+        distances = []
+        match = 'none'
+        for template in templates:
+            if mode == 'MFCC':
+                distance, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=lambda x, y: norm(x - y, ord=1))
+                distances.append((template[0], distance))
+            elif mode == 'FM':
+                distance_mfcc, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=lambda x, y: norm(x - y, ord=1))
+                distance_fft, path = fastdtw(template[2], sample[2], dist=euclidean)
+                distance_av = (distance_mfcc + distance_fft) / 2
+                distances.append((template[0], distance_av))
+                
+        match = min(distances, key= lambda t: t[1])
+        end = time.time()
+        execution_time = end - start
+        print("Sample:", sample[0], " matched with template:", match[0], 'execution time:', execution_time)
+    
+    print('stop')
+    return 
+
+
+
+
 
 
 def recognize(templates):
     sample = record_process_audio()
-    sample = process_signal(sample, sampling_freq)
+    sample = process_signal(sample, RATE)
 
-    recognized = False
+    recognized = True
     # dynamic time wrapping to pair corresponding frames
     # also return a distance between two time sequences - similarity measure
     # TODO find out a distance that means that no words are recognized
+    distance_old = 0
+    match = 'none'
     for template in templates:
-        distance, path = fastdtw(template, sample, dist=euclidean)
-
-        match = template
-
+        distance_new, path = fastdtw(template, sample, dist=euclidean)
+        if distance_new < distance_old:
+            match = template
     return recognized, match
 
 
@@ -109,13 +171,13 @@ def training(keywords, commandos):
         # TODO make the func return, as soon as offset detected
         template = record_process_audio()
         template = process_signal(
-            template, sampling_freq)  # TODO sampling freq
+            template, RATE) 
         templates_keywords.update({keyword: template})
 
     # record, process and store a commando
     for commando in commandos:
         template = record_process_audio()
-        template = process_signal(template, sampling_freq)
+        template = process_signal(template, RATE)
         templates_commandos.update({commando: template})
 
     return templates_keywords, templates_commandos

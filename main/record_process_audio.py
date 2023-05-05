@@ -11,8 +11,8 @@ from helperf import *
 
 pause_timer = 4 #! magic number
 
-start = time.time()         #[10.2]
-print("Start")
+#start = time.time()         #[10.2]
+#print("Start")
 
 
 # ******************************************************
@@ -61,7 +61,7 @@ lp_coeff = signal.bessel(10, 11000, btype='lowpass', output='sos', fs=RATE)
 win_han = signal.windows.hann(CHUNK)
 
 
-print("start") # show where onset detection loop starts 
+#print("start") # show where onset detection loop starts 
 
 #  Main loop for running over the audio signal 
 
