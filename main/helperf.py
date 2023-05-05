@@ -8,6 +8,8 @@ import math
 from scipy import signal
 from scipy.spatial.distance import euclidean
 import numpy as np
+from librosa.feature import mfcc
+
 
 f1_threshhold = 0.4
 f2_threshhold = 30
@@ -19,6 +21,18 @@ RATE = 44100    #Hz
 CHUNK = 4096
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
+
+# Bereiche: [low,high] --> what are these ?
+hf_range = [5000, 9000]
+lf_range = [0, 10]
+
+
+# Calc filter coefficients
+hp_coeff = signal.bessel(2, 100, btype='highpass', output='sos', fs=RATE)
+lp_coeff = signal.bessel(10, 11000, btype='lowpass', output='sos', fs=RATE)
+win_han = signal.windows.hann(CHUNK)
+
+
 
 # Generate reference frequency for 
 x = np.linspace(0,RATE,RATE)
@@ -88,6 +102,24 @@ def extractFeatures(fft_norm, hf_range, lf_range,vol_tres, mode="on-off-set"):
 		features += 1
 
 	return features # number of features detected 
+
+
+
+# testing functions
+# processing templates
+def process_signal(audio, sampling_freq, mode):
+    # filtering
+    win_size = audio.shape[0]
+    win_han = signal.windows.hann(win_size)
+    filtered = applyFilter(audio, win_han, lp_coeff, hp_coeff)
+
+    if mode == 'MFCC':
+    # extracting mfcc features from templates
+        features_templates = mfcc(y=filtered, sr=sampling_freq)
+    elif mode == 'FFT':
+        features_templates = applyFFT(filtered, sampling_freq, win_han, lp_coeff, hp_coeff)
+
+    return features_templates
 
 
 def dtw_table(x, y, distance=None):

@@ -9,20 +9,11 @@ import time
 from helperf import *
 from record_process_audio import record_process_audio
 from fastdtw import fastdtw
-from scipy.spatial.distance import euclidean, sqeuclidean
+from scipy.spatial.distance import euclidean
 from dtw import dtw
 from numpy.linalg import norm
 
 
-# Bereiche: [low,high] --> what are these ?
-hf_range = [5000, 9000]
-lf_range = [0, 10]
-
-
-# Calc filter coefficients
-hp_coeff = signal.bessel(2, 100, btype='highpass', output='sos', fs=RATE)
-lp_coeff = signal.bessel(10, 11000, btype='lowpass', output='sos', fs=RATE)
-win_han = signal.windows.hann(CHUNK)
 
 # ***********************************************************
 
@@ -33,21 +24,6 @@ template_folder = './templates'
 sample_folder = './samples'
 
 
-# testing functions
-# processing templates
-def process_signal(audio, sampling_freq, mode):
-    # filtering
-    win_size = audio.shape[0]
-    win_han = signal.windows.hann(win_size)
-    filtered = applyFilter(audio, win_han, lp_coeff, hp_coeff)
-
-    if mode == 'MFCC':
-    # extracting mfcc features from templates
-        features_templates = mfcc(y=filtered, sr=sampling_freq)
-    elif mode == 'FFT':
-        features_templates = applyFFT(filtered, sampling_freq, win_han, lp_coeff, hp_coeff)
-
-    return features_templates
 
 
 
@@ -126,7 +102,7 @@ def recognize_prerecorded(mode):
 
 
 
-def recognize(templates):
+def recognize(templates, mode):
     sample = record_process_audio()
     sample = process_signal(sample, RATE)
 
