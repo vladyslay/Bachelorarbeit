@@ -2,15 +2,10 @@
 #************************************************************
 #********************Initialisierung*************************
 #************************************************************
-#import numpy as np
-#from scipy.fftpack import fft
-#from scipy import signal
 #import sys
 import time
-#import pyaudio
-#import math
-#import audioop 
-#import matplotlib.pyplot as plt
+from scipy.spatial.distance import *
+from numpy.linalg import norm
 from speech_recognition import recognize, training, recognize_prerecorded
 ########################################## Ansprechen des Boards 
 #GPIO:                                          #[3]
@@ -33,11 +28,28 @@ pause_timer = 4 #! magic number
 
 
 #************************************************************
+#**************figuring out best parameters******************
+#************************************************************
+
+# metric
+# features
+features = ['FFT', 'MFCC', 'FM']
+metrics = [euclidean, braycurtis, canberra, chebyshev, cityblock, correlation, cosine, sqeuclidean, (lambda x, y: norm(x - y, ord=1))]
+times = []
+
+for feature in features:
+    for metric in metrics:
+        time = recognize_prerecorded(feature, metric)
+        times.append((feature, metric, time))
+
+
+
+#************************************************************
 #********************Testing prerecorded*********************
 #************************************************************
 
 
-recognize_prerecorded('MFCC')
+recognize_prerecorded('FM')
 
 
 '''

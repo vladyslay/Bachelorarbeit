@@ -4,12 +4,13 @@ from scipy.fftpack import fft
 from scipy import signal
 import audioop 
 import pyaudio
-import math
 from scipy import signal
-from scipy.spatial.distance import euclidean
 import numpy as np
 from librosa.feature import mfcc
 
+# ******************************************************
+# ************* Define params **************************
+# ******************************************************
 
 f1_threshhold = 0.4
 f2_threshhold = 30
@@ -39,6 +40,12 @@ x = np.linspace(0,RATE,RATE)
 #ref = 300*np.sin(10000*2*np.pi*x)   #250 in freq.py
 ref = 250*np.sin(10000*2*np.pi*x)
 ref = ref[0:CHUNK]
+
+
+# ******************************************************
+# ************* Define functions ***********************
+# ******************************************************
+
 
 def applyFilter(ein, win_han, lp, hp):
     
@@ -121,7 +128,7 @@ def process_signal(audio, sampling_freq, mode):
 
     return features_templates
 
-
+'''
 def dtw_table(x, y, distance=None):
     if distance is None:
         distance = euclidean
@@ -141,7 +148,7 @@ def dtw_table(x, y, distance=None):
             table[i, j] = d + min(table[i-1, j], table[i, j-1], table[i-1,j-1])
     return table
 
-def dtw(x, y, table):
+def dtw_fft(x, y, table):
     i = len(x)
     j = len(y)
     path = [(i,j)]
@@ -161,3 +168,42 @@ def dtw(x, y, table):
     return np.array(path)
 
 
+
+def dtw_fft(s, t):
+    n, m = len(s), len(t)
+    dtw_matrix = np.zeros((n+1, m+1))
+    for i in range(n+1):
+        for j in range(m+1):
+            dtw_matrix[i, j] = np.inf
+    dtw_matrix[0, 0] = 0
+    
+    for i in range(1, n+1):
+        for j in range(1, m+1):
+            cost = abs(s[i-1] - t[j-1])
+            # take last min from a square box
+            last_min = np.min([dtw_matrix[i-1, j], dtw_matrix[i, j-1], dtw_matrix[i-1, j-1]])
+            dtw_matrix[i, j] = cost + last_min
+    return dtw_matrix[-1][-1]
+
+def dtw_fft_window(s, t, window):
+    n, m = len(s), len(t)
+    w = np.max([window, abs(n-m)])
+    dtw_matrix = np.zeros((n+1, m+1))
+    
+    for i in range(n+1):
+        for j in range(m+1):
+            dtw_matrix[i, j] = np.inf
+    dtw_matrix[0, 0] = 0
+    
+    for i in range(1, n+1):
+        for j in range(np.max([1, i-w]), np.min([m, i+w])+1):
+            dtw_matrix[i, j] = 0
+    
+    for i in range(1, n+1):
+        for j in range(np.max([1, i-w]), np.min([m, i+w])+1):
+            cost = abs(s[i-1] - t[j-1])
+            # take last min from a square box
+            last_min = np.min([dtw_matrix[i-1, j], dtw_matrix[i, j-1], dtw_matrix[i-1, j-1]])
+            dtw_matrix[i, j] = cost + last_min
+    return dtw_matrix[-1][-1]
+'''

@@ -1,11 +1,8 @@
 
 import numpy as np
-from scipy.fftpack import fft
 from scipy import signal
-import sys
 import time
 import pyaudio
-import matplotlib.pyplot as plt
 import pigpio as GPIO           
 from helperf import *
 
@@ -16,17 +13,8 @@ pause_timer = 4 #! magic number
 
 
 # ******************************************************
-# ************* Define params **************************
+# ************* Initialize *****************************
 # ******************************************************
-'''
-FRAME = 10      #ms
-RATE = 44100    #Hz
-#CHUNK = int(RATE * FRAME * pow(10, -3))
-CHUNK = 4096
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-'''
-
 
 audio = pyaudio.PyAudio()
 
@@ -39,26 +27,12 @@ stream = audio.open(
     frames_per_buffer = CHUNK
 )
 
-# Datastructures
-#TODO define structures for templates and utteraces
-templates = {}	# dict to store transcription alongside of a piece of audio in form "sound" : np.array
-# utterance = [np.array()] array von np arrays
-
  
 
 # ******************************************************
-# ************* Main Script ****************************
+# ************* Record and process *********************
 # ******************************************************
 
-#Bereiche: [low,high] --> what are these ? 
-hf_range = [5000,9000]
-lf_range = [0,10]
-
-
-# Calc filter coefficients 
-hp_coeff = signal.bessel(2, 100, btype='highpass', output='sos', fs=RATE)
-lp_coeff = signal.bessel(10, 11000, btype='lowpass', output='sos', fs=RATE)
-win_han = signal.windows.hann(CHUNK)
 
 
 #print("start") # show where onset detection loop starts 

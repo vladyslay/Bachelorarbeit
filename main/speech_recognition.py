@@ -1,23 +1,20 @@
 # module to develope and test speech recognition separately
 
-from librosa.feature import mfcc
 import librosa
-import numpy as np
-from scipy import signal
 import os
 import time
 from helperf import *
 from record_process_audio import record_process_audio
-from fastdtw import fastdtw
 from scipy.spatial.distance import euclidean
-from dtw import dtw
+from dtw import dtw as dtw_mfcc
 from numpy.linalg import norm
+from tslearn.metrics import dtw
 
 
 
 # ***********************************************************
 
-#! this code is based on a pre recorded audiofiles (to exclude errors of on/off-set setting)
+#! this code is based on a pre recorded audio files (to exclude errors of on/off-set setting)
 
 # storage locations for audiofiles
 template_folder = './templates'
@@ -30,7 +27,7 @@ sample_folder = './samples'
 
 
 # recognize for prerecorded audio samples
-def recognize_prerecorded(mode):
+def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
     # process and store templates
     # templates = {"label": np.ndarray}
     templates = []
@@ -49,9 +46,6 @@ def recognize_prerecorded(mode):
             processed_template_mfcc = process_signal(audio, sampling_freq, 'MFCC')
             processed_template_fft = process_signal(audio, sampling_freq, 'FFT')
             templates.append((filename[:-6], processed_template_mfcc, processed_template_fft))
-        
-        #print('Template processed', templates[-1][0])
-        #print("Template shape: ", processed_template.shape)
     
     
     # process and store samples
@@ -81,13 +75,18 @@ def recognize_prerecorded(mode):
         match = 'none'
         for template in templates:
             if mode == 'MFCC':
-                distance, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=lambda x, y: norm(x - y, ord=1))
+                distance, cost, acc_cost, path = dtw_mfcc(template[1].T, sample[1].T, dist=metric)
                 distances.append((template[0], distance))
             elif mode == 'FM':
-                distance_mfcc, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=lambda x, y: norm(x - y, ord=1))
-                distance_fft, path = fastdtw(template[2], sample[2], dist=euclidean)
+                distance_mfcc, cost, acc_cost, path = dtw_mfcc(template[1].T, sample[1].T, dist=metric)
+                #print('mfcc distance calculated')
+                distance_fft = dtw(template[-1], sample[-1])
+                #print('fft distance calculated')
                 distance_av = (distance_mfcc + distance_fft) / 2
                 distances.append((template[0], distance_av))
+            elif mode == 'FFT':
+                distance_fft = dtw(template[-1], sample[-1])
+                distances.append((template[0], distance_fft))
                 
         match = min(distances, key= lambda t: t[1])
         end = time.time()
@@ -95,28 +94,41 @@ def recognize_prerecorded(mode):
         print("Sample:", sample[0], " matched with template:", match[0], 'execution time:', execution_time)
     
     print('stop')
-    return 
+    return execution_time
 
 
 
-
+#! functions for execution on embedded devise
 
 
 def recognize(templates, mode):
+    
+    # record voice command and extract it's features
     sample = record_process_audio()
-    sample = process_signal(sample, RATE)
+    sample = process_signal(sample, RATE, mode)
 
-    recognized = True
+    
     # dynamic time wrapping to pair corresponding frames
     # also return a distance between two time sequences - similarity measure
-    # TODO find out a distance that means that no words are recognized
-    distance_old = 0
+    start = time.time()
+    distances = []
     match = 'none'
     for template in templates:
-        distance_new, path = fastdtw(template, sample, dist=euclidean)
-        if distance_new < distance_old:
-            match = template
-    return recognized, match
+        if mode == 'MFCC':
+            distance, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=lambda x, y: norm(x - y, ord=1))
+            distances.append((template[0], distance))
+        elif mode == 'FM':
+            distance_mfcc, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=lambda x, y: norm(x - y, ord=1))
+            distance_fft = dtw(template[-1], sample[-1])
+            distance_av = (distance_mfcc + distance_fft) / 2
+            distances.append((template[0], distance_av))
+        elif mode == 'FFT':
+            distance_fft = dtw(template[-1], sample[-1])
+            distances.append((template[0], distance_fft))
+    match = min(distances, key= lambda t: t[1])
+    end = time.time()
+    execution_time = end - start            
+    return match, execution_time
 
 
 '''
@@ -138,22 +150,22 @@ def recognize_feedback():
 '''
 
 
-def training(keywords, commandos):
+def training(keywords, commandos, mode):
     # separate storage spaces for diff types of templates to reduce search spaces
-    templates_keywords = {}
-    templates_commandos = {}
+    templates_keywords = []
+    templates_commandos = []
     # record, process and store a template
     for keyword in keywords:
         # TODO make the func return, as soon as offset detected
         template = record_process_audio()
         template = process_signal(
-            template, RATE) 
-        templates_keywords.update({keyword: template})
+            template, RATE, mode) 
+        templates_keywords.append((keyword, template))
 
     # record, process and store a commando
     for commando in commandos:
         template = record_process_audio()
-        template = process_signal(template, RATE)
-        templates_commandos.update({commando: template})
+        template = process_signal(template, RATE, mode)
+        templates_commandos.append((commando, template))
 
     return templates_keywords, templates_commandos
