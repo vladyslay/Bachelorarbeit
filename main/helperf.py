@@ -122,11 +122,11 @@ def process_signal(audio, sampling_freq, mode):
 
     if mode == 'MFCC':
     # extracting mfcc features from templates
-        features_templates = mfcc(y=filtered, sr=sampling_freq)
+        features = mfcc(y=filtered, sr=sampling_freq)
     elif mode == 'FFT':
-        features_templates = applyFFT(filtered, sampling_freq, win_han, lp_coeff, hp_coeff)
+        features = applyFFT(filtered, sampling_freq, win_han, lp_coeff, hp_coeff)
 
-    return features_templates
+    return features
 
 '''
 def dtw_table(x, y, distance=None):

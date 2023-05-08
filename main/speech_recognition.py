@@ -26,10 +26,11 @@ sample_folder = './samples'
 
 
 
-# recognize for prerecorded audio samples
+#! recognize for prerecorded audio samples
+
 def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
-    # process and store templates
-    # templates = {"label": np.ndarray}
+    # extract, process and store templates
+    # templates = [("label", np.ndarray)]
     templates = []
     for filename in [x for x in os.listdir(template_folder) if x.endswith('.wav')][:-1]:
         # loading files
@@ -47,8 +48,15 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
             processed_template_fft = process_signal(audio, sampling_freq, 'FFT')
             templates.append((filename[:-6], processed_template_mfcc, processed_template_fft))
     
+    # plotting mfcc features
+    '''
+    mfcc_features = mfcc_features.T
+    plt.matshow(mfcc_features)
+    plt.title('MFCC')
+    '''
     
-    # process and store samples
+    # extract, process and store samples
+    # samples = [("label", np.ndarray)]
     samples = []
     for filename in [x for x in os.listdir(sample_folder) if x.endswith('.wav')][:-1]:
         # loading files
@@ -79,9 +87,7 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
                 distances.append((template[0], distance))
             elif mode == 'FM':
                 distance_mfcc, cost, acc_cost, path = dtw_mfcc(template[1].T, sample[1].T, dist=metric)
-                #print('mfcc distance calculated')
                 distance_fft = dtw(template[-1], sample[-1])
-                #print('fft distance calculated')
                 distance_av = (distance_mfcc + distance_fft) / 2
                 distances.append((template[0], distance_av))
             elif mode == 'FFT':
