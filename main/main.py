@@ -7,6 +7,7 @@ import time
 from scipy.spatial.distance import *
 from numpy.linalg import norm
 from speech_recognition import recognize, training, recognize_prerecorded
+from speech_recognition_ml import *
 ########################################## Ansprechen des Boards 
 #GPIO:                                          #[3]
 # import RPi.GPIO as GPIO 
@@ -30,7 +31,7 @@ pause_timer = 4 #! magic number
 #************************************************************
 #**************figuring out best parameters******************
 #************************************************************
-
+'''
 # metric
 # features
 features = ['FFT', 'MFCC', 'FM']
@@ -41,8 +42,12 @@ for feature in features:
     for metric in metrics:
         time = recognize_prerecorded(feature, metric)
         times.append((feature, metric, time))
+        
+        
+#! HMM and DTW compare
 
 
+'''
 
 #************************************************************
 #********************Testing prerecorded*********************

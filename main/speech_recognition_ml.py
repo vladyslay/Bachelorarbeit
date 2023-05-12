@@ -5,11 +5,13 @@ import numpy as np
 from scipy.io import wavfile 
 from hmmlearn import hmm #importing GaussianHMM 
 
+'''
 input_folder = './hmm-speech-recognition-0.1/audio'
 for dirname in os.listdir(input_folder):
   subfolder = os.path.join(input_folder, dirname)
   label = subfolder[subfolder.rfind('/') + 1:]
   print(label)
+'''
   
 class HMMTrainer(object):
    def __init__(self, model_name='GaussianHMM', n_components=4):
@@ -53,6 +55,7 @@ for filename in [x for x in os.listdir(subfolder) if x.endswith('.wav')][:-1]:
    y_words.append(label)
 print('X.shape =', X.shape)
 
+'''
 hmm_trainer = HMMTrainer()
 hmm_trainer.train(X)
 hmm_models.append((hmm_trainer, label))
@@ -75,3 +78,5 @@ for item in hmm_models:
   # Print the output
   print("\nTrue:", input_file[input_file.find('/')+1:input_file.rfind('/')])
   print("Predicted:", hmm_models[index][1])
+  
+'''

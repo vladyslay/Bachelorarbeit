@@ -9,6 +9,7 @@ from scipy.spatial.distance import euclidean
 from dtw import dtw as dtw_mfcc
 from numpy.linalg import norm
 from tslearn.metrics import dtw
+from speech_recognition_ml import *
 
 
 
@@ -101,6 +102,77 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
     
     print('stop')
     return execution_time
+
+# HMM recognition for prerecorded samples
+
+def recognize_prerecorded_ml(mode, dataset='open_source'):
+    
+    # create templates, as for dtw
+    templates = []
+    for filename in [x for x in os.listdir(template_folder) if x.endswith('.wav')][:-1]:
+        # loading files
+        filepath = os.path.join(template_folder, filename)
+        audio, sampling_freq = librosa.load(filepath)
+
+        if mode == 'MFCC':
+            processed_template = process_signal(audio, sampling_freq, 'MFCC')
+            templates.append((filename[:-6], processed_template))
+        elif mode == 'FFT':
+            processed_template = process_signal(audio, sampling_freq, 'FFT')
+            templates.append((filename[:-6], processed_template))
+        elif mode == 'FM':
+            processed_template_mfcc = process_signal(audio, sampling_freq, 'MFCC')
+            processed_template_fft = process_signal(audio, sampling_freq, 'FFT')
+            templates.append((filename[:-6], processed_template_mfcc, processed_template_fft))
+    
+    
+    # create samples as for dtw
+    samples = []
+    for filename in [x for x in os.listdir(sample_folder) if x.endswith('.wav')][:-1]:
+        # loading files
+        filepath = os.path.join(sample_folder, filename)
+        audio, sampling_freq = librosa.load(filepath)
+
+        if mode == 'MFCC':
+            processed_sample = process_signal(audio, sampling_freq, 'MFCC')
+            samples.append((filename[:-6], processed_sample))
+        elif mode == 'FFT':
+            processed_sample = process_signal(audio, sampling_freq, 'FFT')
+            samples.append((filename[:-6], processed_sample))
+        elif mode == 'FM':
+            processed_sample_mfcc = process_signal(audio, sampling_freq, 'MFCC')
+            processed_sample_fft = process_signal(audio, sampling_freq, 'FFT')
+            samples.append((filename[:-6], processed_sample_mfcc, processed_sample_fft))
+    
+    
+    # train model
+    
+    if dataset == 'lear_phase':
+        #! small dataset from learning phase
+        hmm_trainer = HMMTrainer()
+        hmm_trainer.train(templates)
+        hmm_models.append((hmm_trainer, label))
+        hmm_trainer = None
+    elif dataset == 'open_source':
+        #! open source speech data
+        #TODO add this open source speech data to project
+        hmm_trainer = HMMTrainer()
+        hmm_trainer.train(X)
+        hmm_models.append((hmm_trainer, label))
+        hmm_trainer = None
+    
+    scores=[]
+    for item in hmm_models:
+      hmm_model, label = item
+      score = hmm_model.get_score(mfcc_features)
+      scores.append(score)
+      index=np.array(scores).argmax()
+      # Print the output
+      #TODO change the input file to template
+      print("\nTrue:", input_file[input_file.find('/')+1:input_file.rfind('/')])
+      print("Predicted:", hmm_models[index][1])
+    
+    return scores
 
 
 
