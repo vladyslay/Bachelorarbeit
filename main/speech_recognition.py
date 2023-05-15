@@ -78,6 +78,9 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
     
     # recognize
     print('Start matching')
+    correct_matches = 0
+    incorrect_matches = 0
+    execution_times = []
     for sample in samples:
         start = time.time()
         distances = []
@@ -98,10 +101,17 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
         match = min(distances, key= lambda t: t[1])
         end = time.time()
         execution_time = end - start
+        execution_times.append(execution_time)
         print("Sample:", sample[0], " matched with template:", match[0], 'execution time:', execution_time)
+        if sample[0] == match[0]:
+            correct_matches += 1
+        else:
+            incorrect_matches += 1
     
-    print('stop')
-    return execution_time
+    correctness = correct_matches/(correct_matches + incorrect_matches)
+    print("Correctness:", correctness)
+    #print('stop')
+    return execution_times, correctness
 
 # HMM recognition for prerecorded samples
 
@@ -113,17 +123,18 @@ def recognize_prerecorded_ml(mode, dataset='open_source'):
         # loading files
         filepath = os.path.join(template_folder, filename)
         audio, sampling_freq = librosa.load(filepath)
+        template_label = filename[:-6]
 
         if mode == 'MFCC':
             processed_template = process_signal(audio, sampling_freq, 'MFCC')
-            templates.append((filename[:-6], processed_template))
+            templates.append((template_label, processed_template))
         elif mode == 'FFT':
             processed_template = process_signal(audio, sampling_freq, 'FFT')
-            templates.append((filename[:-6], processed_template))
+            templates.append((template_label, processed_template))
         elif mode == 'FM':
             processed_template_mfcc = process_signal(audio, sampling_freq, 'MFCC')
             processed_template_fft = process_signal(audio, sampling_freq, 'FFT')
-            templates.append((filename[:-6], processed_template_mfcc, processed_template_fft))
+            templates.append((template_label, processed_template_mfcc, processed_template_fft))
     
     
     # create samples as for dtw
@@ -132,47 +143,60 @@ def recognize_prerecorded_ml(mode, dataset='open_source'):
         # loading files
         filepath = os.path.join(sample_folder, filename)
         audio, sampling_freq = librosa.load(filepath)
+        sample_label = filename[:-6]
 
         if mode == 'MFCC':
             processed_sample = process_signal(audio, sampling_freq, 'MFCC')
-            samples.append((filename[:-6], processed_sample))
+            samples.append((sample_label, processed_sample))
         elif mode == 'FFT':
             processed_sample = process_signal(audio, sampling_freq, 'FFT')
-            samples.append((filename[:-6], processed_sample))
+            samples.append((sample_label, processed_sample))
         elif mode == 'FM':
             processed_sample_mfcc = process_signal(audio, sampling_freq, 'MFCC')
             processed_sample_fft = process_signal(audio, sampling_freq, 'FFT')
-            samples.append((filename[:-6], processed_sample_mfcc, processed_sample_fft))
+            samples.append((sample_label, processed_sample_mfcc, processed_sample_fft))
     
     
     # train model
     
-    if dataset == 'lear_phase':
+    if dataset == 'learn_phase':
         #! small dataset from learning phase
+        train_start = time.time()
         hmm_trainer = HMMTrainer()
         hmm_trainer.train(templates)
         hmm_models.append((hmm_trainer, label))
         hmm_trainer = None
+        train_end = time.time()
+        train_time = train_start - train_end
     elif dataset == 'open_source':
         #! open source speech data
         #TODO add this open source speech data to project
+        train_start = time.time()
         hmm_trainer = HMMTrainer()
         hmm_trainer.train(X)
         hmm_models.append((hmm_trainer, label))
         hmm_trainer = None
+        train_end = time.time()
+        train_time = train_start - train_end
     
     scores=[]
+    recognition_times =[]
     for item in hmm_models:
       hmm_model, label = item
-      score = hmm_model.get_score(mfcc_features)
+      recognition_time_start = time.time()
+      score = hmm_model.get_score(samples[1])
       scores.append(score)
       index=np.array(scores).argmax()
+      recognition_time_end = time.time()
+      recognition_time = recognition_time_end - recognition_time_start
+      recognition_times.append(recognition_time)
+      
       # Print the output
       #TODO change the input file to template
-      print("\nTrue:", input_file[input_file.find('/')+1:input_file.rfind('/')])
+      print("\nTrue:", label)
       print("Predicted:", hmm_models[index][1])
     
-    return scores
+    return scores, train_time, recognition_times
 
 
 
