@@ -1,5 +1,7 @@
 # **Programmdesign**
 
+![](module_diagram.png)
+
 ## **Lernphase**
 1. Nutzer ließt vorgefertigten Text. 
 2. Spezielle Schlüsselwörter, wie "Exo", "Ok" und "Nein" werden mehmals vorgelesen (da sie von besonderer Bedeutung sind und wir wollen, dass sie mit höchstmöglicher Wahrscheinlichkeit erkannt werden)
