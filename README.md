@@ -27,7 +27,7 @@
 3. Falls "Nein" erkannt wird - kehre zum Schritt 1 von Erkennungsphase
 4. Falls Schritt 7 der Erkennungsphase statt fand: "Ok" wird erkannt - gehe zur Erkennungsphase Schritt 4, "Nein" wird erkannt - gehe zur Erkennungsphase Schritt 1
 
-![](funktion_interaction_chart.png)
+
 
 
 ## **TODO**
