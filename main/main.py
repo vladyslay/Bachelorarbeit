@@ -26,7 +26,9 @@ pause_timer = 4 #! magic number
 #GPIO.setup(pin_detect, GPIO.IN)
 #GPIO.setup(pin_off, GPIO.OUT)
 
-
+mode_mfcc = 'MFCC'
+mode_fft = 'FFT'
+mode_mfcc_fft = 'FM'
 
 #************************************************************
 #**************figuring out best parameters******************
@@ -45,8 +47,8 @@ for feature in features:
         
 '''    
 #! HMM and DTW compare
-matching_time_tm, correctness_tm = recognize_prerecorded('MFCC')
-correctness_ml, training_time, matching_time_ml = recognize_prerecorded_ml('MFCC', 'learn_phase')
+matching_time_tm, correctness_tm = recognize_prerecorded(mode_mfcc)
+correctness_ml, training_time, matching_time_ml = recognize_prerecorded_ml(mode_mfcc, 'learn_phase')
 
 print('Template matching')
 print("Matching times | Correctness")

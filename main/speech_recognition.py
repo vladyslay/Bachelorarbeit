@@ -5,7 +5,6 @@ import os
 import time
 from helperf import *
 from record_process_audio import record_process_audio
-from scipy.spatial.distance import euclidean
 from dtw import dtw as dtw_mfcc
 from numpy.linalg import norm
 from tslearn.metrics import dtw

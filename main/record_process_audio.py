@@ -1,9 +1,7 @@
 
 import numpy as np
-from scipy import signal
 import time
-import pyaudio
-import pigpio as GPIO           
+import pyaudio           
 from helperf import *
 
 pause_timer = 4 #! magic number
