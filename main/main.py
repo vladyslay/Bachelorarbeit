@@ -6,7 +6,7 @@
 import time
 from scipy.spatial.distance import *
 from numpy.linalg import norm
-from speech_recognition import recognize, training, recognize_prerecorded
+from speech_recognition import recognize, training, recognize_prerecorded, recognize_prerecorded_ml
 from speech_recognition_ml import *
 ########################################## Ansprechen des Boards 
 #GPIO:                                          #[3]
@@ -43,11 +43,23 @@ for feature in features:
         time = recognize_prerecorded(feature, metric)
         times.append((feature, metric, time))
         
-        
+'''    
 #! HMM and DTW compare
+matching_time_tm, correctness_tm = recognize_prerecorded('MFCC')
+correctness_ml, training_time, matching_time_ml = recognize_prerecorded_ml('MFCC', 'learn_phase')
+
+print('Template matching')
+print("Matching times | Correctness")
+for i in range [1, len(matching_time_tm)]:
+    print(matching_time_tm[i], correctness_tm[i])
+
+print('HMM')
+print("Matching times | Correctness")    
+for i in range [1, len(matching_time_tm)]:
+    print(matching_time_ml[i], correctness_ml[i])
+print('Training time:', training_time)
 
 
-'''
 
 #************************************************************
 #********************Testing prerecorded*********************
@@ -65,9 +77,10 @@ recognize_prerecorded('FM')
 
 # define the list of needed keywords and commands
 keywords = ["exo", "ok", "nein"]
+#TODO develope commandos
 commandos = []
 
-training_finished = False
+# training process itself, returns sets of templates
 templates_keywords, templates_commandos = training(keywords, commandos)
 
 #************************************************************
@@ -77,20 +90,23 @@ templates_keywords, templates_commandos = training(keywords, commandos)
 keyword_recognized = False
 commando_recognized = False
 
-while keyword_recognized == False:
-    # has to return a val for keyword_recognize
-    keyword_recognized, matched_keyword = recognize(keywords)
-    while commando_recognized == False and keyword_recognized == True:
-        # has to return a val for commando_recognized 
-        commando_recognized, matched_commando = recognize(commandos)
+# start with keyword recognition
+matched_keyword, matching_keyword_time = recognize(keywords, 'MFCC')
+if matched_keyword == "exo":
+    # match commando
+    matched_commando, matching_commando_time = recognize(commandos, 'MFCC')
+    
+    #************************************************************
+    #********************Feedback phase**************************
+    #************************************************************
 
+    matched_feedback, matching_commando_time = recognize(keywords, 'MFCC')
+    
+    if matched_feedback == 'ok':
+        # output interface
+        forward_command(matched_commando)
+    else:
+        
 
-
-#************************************************************
-#********************Feedback phase**************************
-#************************************************************
-
-feedback_recognized = False
-recognize()
 
 '''

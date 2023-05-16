@@ -157,8 +157,11 @@ def recognize_prerecorded_ml(mode, dataset='open_source'):
             samples.append((sample_label, processed_sample_mfcc, processed_sample_fft))
     
     
-    # train model
+    # create model
+    hmm_models = []
     
+    
+    # train model
     if dataset == 'learn_phase':
         #! small dataset from learning phase
         train_start = time.time()
@@ -203,7 +206,7 @@ def recognize_prerecorded_ml(mode, dataset='open_source'):
 #! functions for execution on embedded devise
 
 
-def recognize(templates, mode):
+def recognize(templates, mode='MFCC'):
     
     # record voice command and extract it's features
     sample = record_process_audio()
