@@ -33,19 +33,27 @@ mode_mfcc_fft = 'FM'
 #************************************************************
 #**************figuring out best parameters******************
 #************************************************************
-'''
+
 # metric
 # features
 features = ['FFT', 'MFCC', 'FM']
-metrics = [euclidean, braycurtis, canberra, chebyshev, cityblock, correlation, cosine, sqeuclidean, (lambda x, y: norm(x - y, ord=1))]
-times = []
+metrics = [euclidean, braycurtis, 
+           canberra, chebyshev, 
+           cityblock, correlation, 
+           cosine, sqeuclidean, 
+           (lambda x, y: norm(x - y, ord=1))]
+configurations = []
 
 for feature in features:
     for metric in metrics:
-        time = recognize_prerecorded(feature, metric)
-        times.append((feature, metric, time))
-        
-'''    
+        matching_time, correctness = recognize_prerecorded(feature, metric)
+        configurations.append((feature, metric, matching_time, correctness))
+print('Configurations:')
+print('Feature | Metric | Matching time | Correctness')
+for i in range [1, len(configurations)]:
+    print(configurations[i][0], configurations[i][1], configurations[i][2], configurations[i][3])
+  
+
 #! HMM and DTW compare
 matching_time_tm, correctness_tm = recognize_prerecorded(mode_mfcc)
 correctness_ml, training_time, matching_time_ml = recognize_prerecorded_ml(mode_mfcc, 'learn_phase')
