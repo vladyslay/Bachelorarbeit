@@ -3,5 +3,6 @@
     "cSpell.enableFiletypes": [
         "tex"
     ],
-    "cmake.sourceDirectory": "C:/Users/Lenovo/Desktop/Studium/Bachelorarbeit/normal code/Bachelorarbeit/main"
+    "cmake.sourceDirectory": "C:/Users/Lenovo/Desktop/Studium/Bachelorarbeit/normal code/Bachelorarbeit/main",
+    "python.analysis.typeCheckingMode": "off"
 }

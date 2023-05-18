@@ -64,7 +64,8 @@ def applyFFT(data_int, RATE, win_han, lp, hp):
     fft_raw = fft(applyFilter(data_int, win_han, lp, hp), n=RATE)    #was wird hier eingesetzt 
 
     # fft postprocessing, abs spectrum and normalization 
-    fft_abs = np.abs(fft_raw[0:11000])
+    #fft_abs = np.abs(fft_raw[0:11000])
+    fft_abs = np.abs(fft_raw)
     fft_norm = (fft_abs-np.min(fft_abs))*1/(np.max(fft_abs)-np.min(fft_abs))
 
     return fft_norm
@@ -118,14 +119,14 @@ def process_signal(audio, sampling_freq, mode):
     # filtering
     win_size = audio.shape[0]
     win_han = signal.windows.hann(win_size)
-    filtered = applyFilter(audio, win_han, lp_coeff, hp_coeff)
+    
 
     if mode == 'MFCC':
     # extracting mfcc features from templates
+        filtered = applyFilter(audio, win_han, lp_coeff, hp_coeff)
         features = mfcc(y=filtered, sr=sampling_freq)
     elif mode == 'FFT':
-        features = applyFFT(filtered, sampling_freq, win_han, lp_coeff, hp_coeff)
-
+        features = applyFFT(audio, sampling_freq, win_han, lp_coeff, hp_coeff)
     return features
 
 '''

@@ -28,7 +28,8 @@ sample_folder = './samples'
 
 #! recognize for prerecorded audio samples
 
-def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
+def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1)), 
+                          coef_mfcc=0.5, coef_fft=0.5, reshaping_factor=7):
     # extract, process and store templates
     # templates = [("label", np.ndarray)]
     templates = []
@@ -42,6 +43,7 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
             templates.append((filename[:-6], processed_template))
         elif mode == 'FFT':
             processed_template = process_signal(audio, sampling_freq, 'FFT')
+            #print(processed_template.shape)
             templates.append((filename[:-6], processed_template))
         elif mode == 'FM':
             processed_template_mfcc = process_signal(audio, sampling_freq, 'MFCC')
@@ -73,6 +75,7 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
             processed_sample_mfcc = process_signal(audio, sampling_freq, 'MFCC')
             processed_sample_fft = process_signal(audio, sampling_freq, 'FFT')
             samples.append((filename[:-6], processed_sample_mfcc, processed_sample_fft))
+            #print('MFCC shape:', samples[-1][1].shape, 'FFT shape:', samples[-1][-1].shape)
         
     
     # recognize
@@ -81,6 +84,7 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
     incorrect_matches = 0
     execution_times = []
     for sample in samples:
+        #print(sample[1].shape)
         start = time.time()
         distances = []
         match = 'none'
@@ -90,11 +94,18 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
                 distances.append((template[0], distance))
             elif mode == 'FM':
                 distance_mfcc, cost, acc_cost, path = dtw_mfcc(template[1].T, sample[1].T, dist=metric)
-                distance_fft = dtw(template[-1], sample[-1])
-                distance_av = (distance_mfcc + distance_fft) / 2
+                distance_fft, cost, acc_cost, path = dtw_mfcc(np.reshape(template[-1], (reshaping_factor, -1)), 
+                                                              np.reshape(sample[-1], (reshaping_factor, -1)), 
+                                                              dist=metric)
+                # distance_fft = dtw(template[-1], sample[-1])
+                #print('Dist mfcc', distance_mfcc)
+                #print('Dist fft:', distance_fft)
+                distance_av = distance_mfcc * coef_mfcc + distance_fft * coef_fft
+                #print('Dist average:', distance_av)
                 distances.append((template[0], distance_av))
             elif mode == 'FFT':
-                distance_fft = dtw(template[-1], sample[-1])
+                distance_fft = dtw(template[1], sample[1])
+                #distance_fft = dtw(template[-1], sample[-1])
                 distances.append((template[0], distance_fft))
                 
         match = min(distances, key= lambda t: t[1])
@@ -111,6 +122,8 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1))):
     print("Correctness:", correctness)
     #print('stop')
     return execution_times, correctness
+
+
 
 # HMM recognition for prerecorded samples
 
