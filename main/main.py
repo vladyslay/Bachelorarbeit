@@ -46,33 +46,7 @@ metrics = [euclidean, braycurtis,
 
 configurations = {}
 
-for metric in metrics:
-    print('Using:', metric)
-    matching_time, correctness = recognize_prerecorded(mode_mfcc_fft, metric, 0.96, 4.0000000000000036, 7)
-    #matching_time = sum(matching_time)/len(matching_time)
-    configurations.update({metric: correctness})
-print('Configurations:')
-print(configurations)
-best_config = max(configurations, key=configurations.get)
-print('best config:', best_config)
-    
-    
-    
-'''
-for feature in features:
-    for metric in metrics:
-        print('Using:', feature, metric)
-        matching_time, correctness = recognize_prerecorded(feature, metric)
-        matching_time = sum(matching_time)/len(matching_time)
-        configurations.append((feature, metric, matching_time, correctness))
-print('Configurations:')
-print('Feature | Metric | Matching time | Correctness')
-for i in range(1, len(metrics)):
-    print(configurations[i][0], configurations[i][1], configurations[i][2], configurations[i][3])
-
-'''
-# according to above compare the best metric for mfcc is cityblock
-#! best_metric = cityblock
+#! finding the best set of parameters for dtw
 
 '''
 reshaping_factors = {}
@@ -86,11 +60,11 @@ print('Faktor | Correctness')
 print(reshaping_factors)
 best_corectness = max(reshaping_factors, key=reshaping_factors.get)
 print('reshaping factor with best performance:', best_corectness)
-'''
+
 #! according to the bove code the best reshaping factor for fft features is 7
     
 
-'''
+
 # try if combination of MFCC with FFT with different weights 
 # has better matching results
 coefficients = {}
@@ -107,9 +81,43 @@ print('best coefs:', best_coefs)
 '''
 
 '''
+for metric in metrics:
+    print('Using:', metric)
+    matching_time, correctness = recognize_prerecorded(mode_mfcc_fft, metric, 
+                                                       0.96, 4.0000000000000036, 7)
+    #matching_time = sum(matching_time)/len(matching_time)
+    configurations.update({metric: correctness})
+print('Configurations:')    
+print(configurations)
+best_config = max(configurations, key=configurations.get)
+print('best config:', best_config)
+'''
+
+# according to above compare the best metric for mfcc is cityblock
+#! best_metric = cityblock   
+    
+    
+'''
+for feature in features:
+    for metric in metrics:
+        print('Using:', feature, metric)
+        matching_time, correctness = recognize_prerecorded(feature, metric)
+        matching_time = sum(matching_time)/len(matching_time)
+        configurations.append((feature, metric, matching_time, correctness))
+print('Configurations:')
+print('Feature | Metric | Matching time | Correctness')
+for i in range(1, len(metrics)):
+    print(configurations[i][0], configurations[i][1], configurations[i][2], configurations[i][3])
+
+'''
+
+
+
+
 #! HMM and DTW compare
-matching_time_tm, correctness_tm = recognize_prerecorded(mode_mfcc)
-correctness_ml, training_time, matching_time_ml = recognize_prerecorded_ml(mode_mfcc, 'learn_phase')
+matching_time_tm, correctness_tm = recognize_prerecorded(mode_mfcc_fft, cityblock, 
+                                                         0.96, 4.0000000000000036, 7)
+correctness_ml, training_time, matching_time_ml = recognize_prerecorded_ml(mode_mfcc_fft, 'learn_phase')
 
 print('Template matching')
 print("Matching times | Correctness")
@@ -124,7 +132,7 @@ print('Training time:', training_time)
 
 
 
-'''
+
 
 #************************************************************
 #********************Testing prerecorded*********************
