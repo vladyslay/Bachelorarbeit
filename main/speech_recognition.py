@@ -30,7 +30,7 @@ sample_folder = './samples'
 #! recognize for prerecorded audio samples
 
 def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1)), 
-                          coef_mfcc=0.5, coef_fft=0.5, reshaping_factor=7):
+                          coef_mfcc=0.5, coef_fft=0.5, reshaping_factor=14):
     # extract, process and store templates
     # templates = [("label", np.ndarray)]
     templates = []
@@ -98,14 +98,15 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1)),
                 distance_fft, cost, acc_cost, path = dtw(np.reshape(template[-1], (reshaping_factor, -1)), 
                                                               np.reshape(sample[-1], (reshaping_factor, -1)), 
                                                               dist=metric)
-                distance_av = distance_mfcc * coef_mfcc + distance_fft * coef_fft
+                distance_av = distance_mfcc * coef_mfcc + (distance_fft * 100) * coef_fft
                 distances.append((template[0], distance_av))
+                
             elif mode == 'FFT':
-                distance_fft = dtw(np.reshape(template[-1], (reshaping_factor, -1)), 
+                distance = dtw(np.reshape(template[-1], (reshaping_factor, -1)), 
                                                               np.reshape(sample[-1], (reshaping_factor, -1)), 
                                                               dist=metric)
                 #distance_fft = dtw(template[-1], sample[-1])
-                distances.append((template[0], distance_fft))
+                distances.append((template[0], distance))
                 
         match = min(distances, key= lambda t: t[1])
         end = time.time()
@@ -118,8 +119,9 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1)),
             incorrect_matches += 1
     
     correctness = correct_matches/(correct_matches + incorrect_matches)
+    execution_time = sum(execution_times)/len(execution_times)
     print("Correctness:", correctness)
-    return execution_times, correctness
+    return execution_time, correctness
 
 
 
@@ -253,16 +255,16 @@ def recognize_prerecorded_ml(mode, dataset='open_source'):
 #! functions for execution on embedded devise
 
 
-def recognize(templates, mode='FM'):
+def recognize(templates):
     # defining some parameters, that were estimated empirically
     metric = cityblock
-    coef_mfcc = 0.96
-    coef_fft = 4.0000000000000036
-    reshaping_factor = 7
+    # coef_mfcc = 0.96
+    # coef_fft = 4.0000000000000036
+    # reshaping_factor = 7
     
     # record voice command and extract it's features
     sample = record_process_audio()
-    sample = process_signal(sample, RATE, mode)
+    sample = process_signal(sample, RATE, 'MFCC')
 
     
     # dynamic time wrapping to pair corresponding frames
@@ -271,22 +273,8 @@ def recognize(templates, mode='FM'):
     distances = [] 
     match = 'none'
     for template in templates:
-        if mode == 'MFCC':
-            distance_mfcc, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=metric)
-            distances.append((template[0], distance_mfcc))
-        elif mode == 'FM':
-            distance_mfcc, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=metric)
-            distance_fft, cost, acc_cost, path = dtw(np.reshape(template[-1], (reshaping_factor, -1)), 
-                                                          np.reshape(sample[-1], (reshaping_factor, -1)), 
-                                                          dist=metric)
-            # calculate the weightend average between two sets of features
-            distance_av = distance_mfcc * coef_mfcc + distance_fft * coef_fft
-            distances.append((template[0], distance_av))
-        elif mode == 'FFT':
-            distance_fft = dtw(np.reshape(template[-1], (reshaping_factor, -1)), 
-                                                          np.reshape(sample[-1], (reshaping_factor, -1)), 
-                                                          dist=metric)
-            distances.append((template[0], distance_fft))
+        distance_mfcc, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=metric)
+        distances.append((template[0], distance_mfcc))
     match = min(distances, key= lambda t: t[1])
     end = time.time()
     execution_time = end - start            

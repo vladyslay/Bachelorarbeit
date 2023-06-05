@@ -6,7 +6,7 @@
 import time
 from scipy.spatial.distance import *
 from numpy.linalg import norm
-from speech_recognition import recognize, training, recognize_prerecorded, recognize_prerecorded_ml
+from speech_recognition import recognize, training, recognize_prerecorded
 from speech_recognition_ml import *
 ########################################## Ansprechen des Boards 
 #GPIO:                                          #[3]
@@ -41,8 +41,7 @@ features = ['FFT', 'MFCC', 'FM']
 metrics = [euclidean, braycurtis, 
            canberra, chebyshev, 
            cityblock, correlation, 
-           cosine, sqeuclidean, 
-           (lambda x, y: norm(x - y, ord=1))]
+           cosine, sqeuclidean]
 
 configurations = {}
 
@@ -51,42 +50,50 @@ configurations = {}
 '''
 reshaping_factors = {}
 matching_time = 0
-for i in range(1, 20):
+for i in range(1, 100):
     if 22050 % i == 0:
-        matching_time, correctness = recognize_prerecorded(mode_mfcc_fft, best_metric, i * 0.1, (1 - i * 0.1) * 100, i) 
-        reshaping_factors.update({i: correctness})    
+        matching_time, correctness = recognize_prerecorded(mode_fft, euclidean, reshaping_factor=i) 
+        reshaping_factors.update({i: (correctness, matching_time)})    
 print('Reshaping faktors:')
 print('Faktor | Correctness')
-print(reshaping_factors)
+for item in reshaping_factors:
+    print(item, reshaping_factors[item])
+#print(reshaping_factors)
 best_corectness = max(reshaping_factors, key=reshaping_factors.get)
 print('reshaping factor with best performance:', best_corectness)
+'''
+
+
 
 #! according to the bove code the best reshaping factor for fft features is 7
     
-
-
+'''
 # try if combination of MFCC with FFT with different weights 
 # has better matching results
 coefficients = {}
-for i in range(1, 100):
-    matching_time, correctness = recognize_prerecorded(mode_mfcc_fft, best_metric, i * 0.01, (1 - i * 0.01) * 1000) 
-    matching_time = sum(matching_time)/len(matching_time)
-    coefficients.update({( i * 0.01, (1 - i * 0.01) * 100): correctness})
+for i in range(1, 100, 5):
+    matching_time, correctness = recognize_prerecorded(mode_mfcc_fft, euclidean, i * 0.01, (1 - i * 0.01)) 
+    
+    coefficients.update({( i * 0.01, (1 - i * 0.01)): correctness})
 print('Coefficients:')
 print('Feature | Metric | Coef. MFCC | Cef. FFT | Matching time | Correctness')
 print(coefficients)
 best_coefs = max(coefficients, key=coefficients.get)
 print('best coefs:', best_coefs)
-#! best coefs: (0.96, 4.0000000000000036)
-'''
+#! best coefs: (0.51, 0.49)
 
 '''
-for metric in metrics:
-    print('Using:', metric)
-    matching_time, correctness = recognize_prerecorded(mode_mfcc_fft, metric, 
-                                                       0.96, 4.0000000000000036, 7)
-    #matching_time = sum(matching_time)/len(matching_time)
-    configurations.update({metric: correctness})
+
+
+
+'''
+for feature in features:    
+    for metric in metrics:
+        print('Using:', feature, metric)
+        matching_time, correctness = recognize_prerecorded(feature, metric=metric, 
+                                                           coef_mfcc=0.51, coef_fft=0.49, reshaping_factor=14)
+        #matching_time = sum(matching_time)/len(matching_time)
+        configurations.update({(metric, feature): (correctness, matching_time)})
 print('Configurations:')    
 print(configurations)
 best_config = max(configurations, key=configurations.get)
@@ -113,7 +120,7 @@ for i in range(1, len(metrics)):
 
 
 
-
+'''
 #! HMM and DTW compare
 matching_time_tm, correctness_tm = recognize_prerecorded(mode_mfcc_fft, cityblock, 
                                                          0.96, 4.0000000000000036, 7)
@@ -129,6 +136,8 @@ print("Matching times | Correctness")
 for i in range [1, len(matching_time_tm)]:
     print(matching_time_ml[i], correctness_ml[i])
 print('Training time:', training_time)
+'''
+
 
 
 
