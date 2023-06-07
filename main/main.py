@@ -5,9 +5,9 @@
 #import sys
 import time
 from scipy.spatial.distance import *
-from numpy.linalg import norm
 from speech_recognition import recognize, training, recognize_prerecorded
 from speech_recognition_ml import *
+from helperf import *
 ########################################## Ansprechen des Boards 
 #GPIO:                                          #[3]
 # import RPi.GPIO as GPIO 
@@ -29,6 +29,10 @@ pause_timer = 4 #! magic number
 mode_mfcc = 'MFCC'
 mode_fft = 'FFT'
 mode_mfcc_fft = 'FM'
+mode_lpc = 'LPC'
+mode_lpc_mfcc = 'LM'
+mode_lpc_fft = 'LF'
+mode_lpc_mfcc_fft = 'LMF'
 
 #************************************************************
 #**************figuring out best parameters******************
@@ -37,7 +41,7 @@ mode_mfcc_fft = 'FM'
 # metric
 # features
 # global constraint
-features = ['FFT', 'MFCC', 'FM']
+features = [mode_fft, mode_lpc, mode_mfcc, mode_mfcc_fft, mode_lpc_mfcc]
 metrics = [euclidean, braycurtis, 
            canberra, chebyshev, 
            cityblock, correlation, 
@@ -83,6 +87,58 @@ print('best coefs:', best_coefs)
 #! best coefs: (0.51, 0.49)
 
 '''
+
+
+'''
+
+
+
+for metric in metrics:
+        print('Using:', metric)
+        matching_time, correctness = recognize_prerecorded(mode_lpc, metric=metric, lpc_order=50)
+        configurations.update({metric: (correctness, matching_time)})
+print(configurations)
+best_config = max(configurations, key=configurations.get)
+print('best config:', best_config)
+'''
+
+'''
+
+# LPC order test
+
+#matching_time, correctness = recognize_prerecorded(mode_lpc, braycurtis, lpc_order=55)
+
+orders = {}
+for i in range(1, 16):
+    matching_time, correctness = recognize_prerecorded(mode_lpc, euclidean, lpc_order=i)
+    orders.update({i: (correctness, matching_time)})
+print('Filter orders for LPC')
+print('Order | Correctness | Matching Time')
+for item in orders:
+    print(item, orders[item])
+#print(reshaping_factors)
+best_corectness = max(orders, key=orders.get)
+print('reshaping factor with best performance:', best_corectness)
+'''
+
+
+
+
+
+# try if combination of MFCC with LPC with different weights 
+# has better matching results
+coefficients = {}
+for i in range(1, 100, 5):
+    for j in range(1, 100 - i, 5):
+        matching_time, correctness = recognize_prerecorded(mode_lpc_mfcc_fft, coef1= (i * 0.01), coef2= (j * 0.01), coef3=(1 - i * 0.01 - j  * 0.01)) 
+        coefficients.update({( i * 0.01, (1 - i * 0.01), (1 - i * 0.01 - j  * 0.01)): correctness})
+print('Coefficients:')
+print('Feature | Metric | Coef. MFCC | Coef. FFT | Coef. LPC | Matching time | Correctness')
+print(coefficients)
+best_coefs = max(coefficients, key=coefficients.get)
+print('best coefs:', best_coefs)
+
+
 
 
 
@@ -139,28 +195,15 @@ print('Training time:', training_time)
 '''
 
 
-
-
-
-
-#************************************************************
-#********************Testing prerecorded*********************
-#************************************************************
-
-
-#recognize_prerecorded(mode_fft, minkowski)
-
-
 '''
-
 #************************************************************
 #************************Learning phase**********************
 #************************************************************
 
 # define the list of needed keywords and commands
-keywords = ["exo", "ok", "nein"]
+keywords = ["exo", "ok", "no"]
 #TODO develope commandos
-commandos = []
+commandos = ['move', 'left', 'right', 'stop']
 
 # training process itself, returns sets of templates
 templates_keywords, templates_commandos = training(keywords, commandos)
@@ -169,26 +212,27 @@ templates_keywords, templates_commandos = training(keywords, commandos)
 #********************Recognition phase***********************
 #************************************************************
 
-keyword_recognized = False
-commando_recognized = False
 
 # start with keyword recognition
-matched_keyword, matching_keyword_time = recognize(keywords, 'MFCC')
+matched_keyword, matching_keyword_time = recognize(keywords)
 if matched_keyword == "exo":
     # match commando
-    matched_commando, matching_commando_time = recognize(commandos, 'MFCC')
+    matched_commando, matching_commando_time = recognize(commandos)
     
     #************************************************************
     #********************Feedback phase**************************
     #************************************************************
-
-    matched_feedback, matching_commando_time = recognize(keywords, 'MFCC')
+    print('Recognized commando:', matched_commando)
+    print('Was your commando recognized right? [ok/no]')
+    matched_feedback, matching_commando_time = recognize(keywords)
     
     if matched_feedback == 'ok':
         # output interface
         forward_command(matched_commando)
     else:
-        
-
+        print('Commando discarded')
 
 '''
+
+
+

@@ -7,6 +7,7 @@ import pyaudio
 from scipy import signal
 import numpy as np
 from librosa.feature import mfcc
+from librosa import lpc
 
 # ******************************************************
 # ************* Define params **************************
@@ -115,7 +116,7 @@ def extractFeatures(fft_norm, hf_range, lf_range,vol_tres, mode="on-off-set"):
 
 # testing functions
 # processing templates
-def process_signal(audio, sampling_freq, mode):
+def process_signal(audio, sampling_freq, mode, lpc_order=6):
     # filtering
     win_size = audio.shape[0]
     win_han = signal.windows.hann(win_size)
@@ -127,7 +128,18 @@ def process_signal(audio, sampling_freq, mode):
         features = mfcc(y=filtered, sr=sampling_freq)
     elif mode == 'FFT':
         features = applyFFT(audio, sampling_freq, win_han, lp_coeff, hp_coeff)
+    elif mode == 'LPC':
+        filtered = applyFilter(audio, win_han, lp_coeff, hp_coeff)
+        features = lpc(y=filtered ,order=lpc_order)
+        #print(features.shape)
+        #print(features)
     return features
+
+
+def forward_command(commando):
+    # interface for sending the command
+    return
+
 
 '''
 def dtw_table(x, y, distance=None):

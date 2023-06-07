@@ -6,10 +6,11 @@ import time
 from helperf import *
 from record_process_audio import record_process_audio
 from dtw import dtw
-from numpy.linalg import norm
+from scipy.spatial.distance import euclidean
 from speech_recognition_ml import *
-from scipy.spatial.distance import cityblock
+from scipy.spatial.distance import cityblock, braycurtis
 from librosa.feature import mfcc
+
 
 
 
@@ -29,8 +30,8 @@ sample_folder = './samples'
 
 #! recognize for prerecorded audio samples
 
-def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1)), 
-                          coef_mfcc=0.5, coef_fft=0.5, reshaping_factor=14):
+def recognize_prerecorded(mode, metric=cityblock, 
+                          coef1=0.5, coef2=0.5, coef3=0, reshaping_factor=14, lpc_order=6):
     # extract, process and store templates
     # templates = [("label", np.ndarray)]
     templates = []
@@ -50,7 +51,18 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1)),
             processed_template_mfcc = process_signal(audio, sampling_freq, 'MFCC')
             processed_template_fft = process_signal(audio, sampling_freq, 'FFT')
             templates.append((filename[:-6], processed_template_mfcc, processed_template_fft))
-    
+        elif mode == 'LPC':
+            processed_template = process_signal(audio, sampling_freq, 'LPC', lpc_order=lpc_order)
+            templates.append((filename[:-6], processed_template))
+        elif mode == 'LM':
+            processed_template_mfcc = process_signal(audio, sampling_freq, 'MFCC')
+            processed_template_lpc= process_signal(audio, sampling_freq, 'LPC',  lpc_order=lpc_order)
+            templates.append((filename[:-6], processed_template_mfcc, processed_template_lpc))
+        elif mode == 'LMF':
+            processed_template_mfcc = process_signal(audio, sampling_freq, 'MFCC')
+            processed_template_fft = process_signal(audio, sampling_freq, 'FFT')
+            processed_template_lpc= process_signal(audio, sampling_freq, 'LPC', lpc_order=lpc_order)
+            templates.append((filename[:-6], processed_template_mfcc, processed_template_lpc, processed_template_fft))
     # plotting mfcc features
     '''
     mfcc_features = mfcc_features.T
@@ -77,6 +89,18 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1)),
             processed_sample_fft = process_signal(audio, sampling_freq, 'FFT')
             samples.append((filename[:-6], processed_sample_mfcc, processed_sample_fft))
             #print('MFCC shape:', samples[-1][1].shape, 'FFT shape:', samples[-1][-1].shape)
+        elif mode == 'LPC':
+            processed_sample = process_signal(audio, sampling_freq, 'LPC', lpc_order=lpc_order)
+            samples.append((filename[:-6], processed_sample))
+        elif mode == 'LM':
+            processed_sample_mfcc = process_signal(audio, sampling_freq, 'MFCC')
+            processed_sample_lpc= process_signal(audio, sampling_freq, 'LPC', lpc_order=lpc_order)
+            samples.append((filename[:-6], processed_sample_mfcc, processed_sample_lpc))
+        elif mode == 'LMF':
+            processed_sample_mfcc = process_signal(audio, sampling_freq, 'MFCC')
+            processed_sample_fft = process_signal(audio, sampling_freq, 'FFT')
+            processed_sample_lpc= process_signal(audio, sampling_freq, 'LPC', lpc_order=lpc_order)
+            samples.append((filename[:-6], processed_sample_mfcc, processed_sample_lpc, processed_sample_fft))
         
     
     # recognize
@@ -98,15 +122,40 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1)),
                 distance_fft, cost, acc_cost, path = dtw(np.reshape(template[-1], (reshaping_factor, -1)), 
                                                               np.reshape(sample[-1], (reshaping_factor, -1)), 
                                                               dist=metric)
-                distance_av = distance_mfcc * coef_mfcc + (distance_fft * 100) * coef_fft
+                distance_av = distance_mfcc * coef1 + (distance_fft * 100) * coef2
                 distances.append((template[0], distance_av))
-                
             elif mode == 'FFT':
                 distance = dtw(np.reshape(template[-1], (reshaping_factor, -1)), 
                                                               np.reshape(sample[-1], (reshaping_factor, -1)), 
                                                               dist=metric)
                 #distance_fft = dtw(template[-1], sample[-1])
                 distances.append((template[0], distance))
+            elif mode == 'LPC':
+                distance, cost, acc_cost, path = dtw(np.reshape(template[1], (7, -1)), 
+                                                              np.reshape(sample[1], (7, -1)), dist=braycurtis)
+                distances.append((template[0], distance))
+            elif mode == 'LM':
+                distance_mfcc, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=metric)
+                distance_lpc, cost, acc_cost, path = dtw(np.reshape(template[-1], (7, -1)), 
+                                                              np.reshape(sample[-1], (7, -1)), dist=braycurtis)
+                #print(distance_mfcc)
+                #print(distance_lpc)
+                distance_av = distance_mfcc * coef1 + distance_lpc * coef2 * 1000
+                distances.append((template[0], distance_av))
+            elif mode == 'LMF':
+                distance_mfcc, cost, acc_cost, path = dtw(template[1].T, sample[1].T, dist=metric)
+                distance_lpc, cost, acc_cost, path = dtw(np.reshape(template[2], (7, -1)), 
+                                                              np.reshape(sample[2], (7, -1)), dist=braycurtis)
+                distance_fft, cost, acc_cost, path = dtw(np.reshape(template[-1], (reshaping_factor, -1)), 
+                                                              np.reshape(sample[-1], (reshaping_factor, -1)), 
+                                                              dist=metric)
+                distance_av = distance_mfcc * coef1 + (distance_fft * 10) * coef2 + (distance_lpc * 1000) * coef3
+                print('coef1:', coef1, 'coef2:', coef2, 'coef3:', coef3)
+                print('dist mfcc:', distance_mfcc, '* coef=', distance_mfcc * coef1)
+                print('dist fft:', distance_fft, '*coef=', (distance_fft * 10) * coef2)
+                print('dist lpc', distance_lpc, '*coef=', (distance_lpc * 1000) * coef3)
+                print('distance av:', distance_av)
+                distances.append((template[0], distance_av))
                 
         match = min(distances, key= lambda t: t[1])
         end = time.time()
@@ -117,8 +166,11 @@ def recognize_prerecorded(mode, metric=(lambda x, y: norm(x - y, ord=1)),
             correct_matches += 1
         else:
             incorrect_matches += 1
+        #print('correct matches:', correct_matches, 'incorrect matches:', incorrect_matches)
+    
     
     correctness = correct_matches/(correct_matches + incorrect_matches)
+    
     execution_time = sum(execution_times)/len(execution_times)
     print("Correctness:", correctness)
     return execution_time, correctness
