@@ -1,14 +1,13 @@
 # helper funktions used by on_off_set.py and speech_recognition.py
 import numpy as np
 from scipy.fftpack import fft
-from scipy import signal
 import audioop 
 import pyaudio
 from scipy import signal
 import numpy as np
 from librosa.feature import mfcc
 from librosa import lpc
-
+from scipy.signal.windows import *
 # ******************************************************
 # ************* Define params **************************
 # ******************************************************
@@ -116,22 +115,21 @@ def extractFeatures(fft_norm, hf_range, lf_range,vol_tres, mode="on-off-set"):
 
 # testing functions
 # processing templates
-def process_signal(audio, sampling_freq, mode, lpc_order=6):
+def process_signal(audio, sampling_freq, mode, lpc_order=6, window=hann):
     # filtering
     win_size = audio.shape[0]
-    win_han = signal.windows.hann(win_size)
-    
+    win = window(win_size)
 
     if mode == 'MFCC':
     # extracting mfcc features from templates
-        filtered = applyFilter(audio, win_han, lp_coeff, hp_coeff)
+        filtered = applyFilter(audio, win, lp_coeff, hp_coeff)
         features = mfcc(y=filtered, sr=sampling_freq)
     elif mode == 'FFT':
-        features = applyFFT(audio, sampling_freq, win_han, lp_coeff, hp_coeff)
+        features = applyFFT(audio, sampling_freq, win, lp_coeff, hp_coeff)
     elif mode == 'LPC':
-        filtered = applyFilter(audio, win_han, lp_coeff, hp_coeff)
+        filtered = applyFilter(audio, win, lp_coeff, hp_coeff)
         features = lpc(y=filtered ,order=lpc_order)
-        #print(features.shape)
+    #print(features.shape)
         #print(features)
     return features
 

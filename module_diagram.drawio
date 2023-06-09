@@ -11,7 +11,7 @@
                     <mxGeometry y="20" width="320" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="3" value="speech_recognition.py" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="55" y="300" width="370" height="250" as="geometry"/>
+                    <mxGeometry x="125" y="300" width="370" height="250" as="geometry"/>
                 </mxCell>
                 <mxCell id="4" value="&lt;div style=&quot;color: rgb(51, 51, 51); background-color: rgb(253, 246, 227); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #268bd2;&quot;&gt;recognize&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color: #cb4b16;&quot;&gt;templates&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;,&lt;/span&gt; &lt;span style=&quot;color: #cb4b16;&quot;&gt;mode&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;)&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="3" vertex="1">
                     <mxGeometry y="30" width="370" height="30" as="geometry"/>
@@ -29,7 +29,7 @@
                     <mxGeometry y="200" width="370" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="7" value="record_process_audio.py" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="10" y="630" width="190" height="90" as="geometry"/>
+                    <mxGeometry x="100" y="630" width="190" height="90" as="geometry"/>
                 </mxCell>
                 <mxCell id="8" value="&lt;div style=&quot;color: rgb(51, 51, 51); background-color: rgb(253, 246, 227); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #268bd2;&quot;&gt;record_process_audio&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;()&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="7" vertex="1">
                     <mxGeometry y="30" width="190" height="30" as="geometry"/>
@@ -37,17 +37,8 @@
                 <mxCell id="9" value="Recording logic" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" parent="7" vertex="1">
                     <mxGeometry y="60" width="190" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="11" value="speech_recognition_ml.py" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="400" y="630" width="170" height="90" as="geometry"/>
-                </mxCell>
-                <mxCell id="12" value="&lt;div style=&quot;color: rgb(51, 51, 51); background-color: rgb(253, 246, 227); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #b58900;&quot;&gt;HMMTrainer&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color: #b58900;&quot;&gt;object&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;)&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="11" vertex="1">
-                    <mxGeometry y="30" width="170" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="13" value="ML recognition base" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" parent="11" vertex="1">
-                    <mxGeometry y="60" width="170" height="30" as="geometry"/>
-                </mxCell>
                 <mxCell id="15" value="helperf.py" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="10" y="780" width="580" height="210" as="geometry"/>
+                    <mxGeometry x="20" y="780" width="580" height="210" as="geometry"/>
                 </mxCell>
                 <mxCell id="16" value="&lt;div style=&quot;color: rgb(51, 51, 51); background-color: rgb(253, 246, 227); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #268bd2;&quot;&gt;applyFilter&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color: #cb4b16;&quot;&gt;ein&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;,&lt;/span&gt; &lt;span style=&quot;color: #cb4b16;&quot;&gt;win_han&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;,&lt;/span&gt; &lt;span style=&quot;color: #cb4b16;&quot;&gt;lp&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;,&lt;/span&gt; &lt;span style=&quot;color: #cb4b16;&quot;&gt;hp&lt;/span&gt;&lt;span style=&quot;color: #2aa198;&quot;&gt;)&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="15" vertex="1">
                     <mxGeometry y="30" width="580" height="30" as="geometry"/>
@@ -67,25 +58,7 @@
                 <mxCell id="48" value="Basic processing funktions" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" parent="15" vertex="1">
                     <mxGeometry y="180" width="580" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="23" value="gui.py" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="440" y="320" width="170" height="120" as="geometry"/>
-                </mxCell>
-                <mxCell id="24" value="Item 1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="23" vertex="1">
-                    <mxGeometry y="30" width="170" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="25" value="Item 2" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="23" vertex="1">
-                    <mxGeometry y="60" width="170" height="30" as="geometry"/>
-                </mxCell>
-                <mxCell id="26" value="Item 3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="23" vertex="1">
-                    <mxGeometry y="90" width="170" height="30" as="geometry"/>
-                </mxCell>
                 <mxCell id="27" value="" style="endArrow=classic;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="3" target="2" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="290" y="450" as="sourcePoint"/>
-                        <mxPoint x="340" y="400" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="29" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="23" target="2" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="290" y="450" as="sourcePoint"/>
                         <mxPoint x="340" y="400" as="targetPoint"/>
@@ -97,19 +70,13 @@
                         <mxPoint x="200" y="520" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="32" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="11" target="42" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="290" y="450" as="sourcePoint"/>
-                        <mxPoint x="320" y="540" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
                 <mxCell id="33" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.555;entryY=1.01;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="15" target="9" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="290" y="650" as="sourcePoint"/>
                         <mxPoint x="120" y="750" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="49" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="15" target="42">
+                <mxCell id="49" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="15" target="42" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="420" y="750" as="sourcePoint"/>
                         <mxPoint x="470" y="700" as="targetPoint"/>
